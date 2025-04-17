@@ -1,0 +1,21 @@
+{
+  "name": "uba-ims-cli-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anishchaulagain/uba-ims-cli-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anishchaulagain/uba-ims-cli-app/issues"
+  },
+  "homepage": "https://github.com/anishchaulagain/uba-ims-cli-app#readme"
+}
