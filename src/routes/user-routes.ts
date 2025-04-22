@@ -62,5 +62,9 @@ switch (command) {
 
     default:
         console.log("Unknown command. Try again");
+        console.log(" npm run cli user:create fname (firstName) lname (lastName)  ");
+        console.log(" npm run cli user:list ");
+        console.log(" npm run cli user:update (ExistingFname) fname (NewFname) lname (NewLname)  ");
+        console.log(" npm run cli user:delete (fname) ");
 
 }
