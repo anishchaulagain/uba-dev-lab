@@ -2,13 +2,26 @@ import { Request, Response } from 'express'
 import { users } from '../data/users'
 import { User } from '../utils/user.type'
 
+//Reusable functions
+const handleError = (res: Response, errorMessage: string = 'Internal server error') => {
+  return res.status(500).json({ message: errorMessage });
+}
 
-export const getAllUser = (req: Request, res: Response):any => {
+const findUserByEmail = (email: string): User | undefined => {
+  return users.find(user => user.email === email);
+}
+
+const findUserIndexByEmail = (email: string): number => {
+  return users.findIndex(user => user.email === email);
+}
+
+
+export const getAllUser = (_req: Request, res: Response):any => {
   try {
     return res.status(200).json(users);
   } catch (error) {
     console.error('Error getting all users:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return handleError(res);
   }
 };
 
@@ -17,7 +30,7 @@ export const getAllUser = (req: Request, res: Response):any => {
 export const getOneUser = (req: Request, res: Response):any => {
   try {
     const { email } = req.params;
-    const user = users.find(user => user.email === email);
+    const user = findUserByEmail(email)
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -26,7 +39,7 @@ export const getOneUser = (req: Request, res: Response):any => {
     return res.status(200).json(user);
   } catch (error) {
     console.error('Error getting user:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return handleError(res);
   }
 };
 
@@ -37,8 +50,7 @@ export const createUser = (req: Request, res: Response):any => {
     const { name, email, age } = req.body;
     
     // Checking if email already exists
-    const existingUser = users.find(user => user.email === email);
-    if (existingUser) {
+    if (findUserByEmail(email)) {
       return res.status(409).json({ message: 'User with this email already exists' });
     }
     
@@ -56,7 +68,7 @@ export const createUser = (req: Request, res: Response):any => {
     });
   } catch (error) {
     console.error('Error creating user:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return handleError(res);
   }
 };
 
@@ -67,7 +79,7 @@ export const updateUser = (req: Request, res: Response):any => {
     const { email } = req.params;
     const { name, age } = req.body;
     
-    const userIndex = users.findIndex((user) => user.email === email);
+    const userIndex =  findUserIndexByEmail(email);
     
     if (userIndex === -1) {
       return res.status(404).json({ message: 'User not found' });
@@ -82,7 +94,7 @@ export const updateUser = (req: Request, res: Response):any => {
     });
   } catch (error) {
     console.error('Error updating user:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return handleError(res);
   }
 };
 
@@ -91,7 +103,7 @@ export const updateUser = (req: Request, res: Response):any => {
 export const deleteUser = (req: Request, res: Response):any => {
   try {
     const { email } = req.params;
-    const userIndex = users.findIndex(user => user.email === email);
+    const userIndex =  findUserIndexByEmail(email);
     
     if (userIndex === -1) {
       return res.status(404).json({ message: 'User not found' });
@@ -101,6 +113,6 @@ export const deleteUser = (req: Request, res: Response):any => {
     return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error deleting user:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return handleError(res);
   }
 };
