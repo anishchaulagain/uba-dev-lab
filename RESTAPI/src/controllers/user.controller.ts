@@ -1,19 +1,8 @@
 import { Request, Response } from 'express'
 import { users } from '../data/users'
 import { User } from '../utils/user.type'
-
-//Reusable functions
-const handleError = (res: Response, errorMessage: string = 'Internal server error') => {
-  return res.status(500).json({ message: errorMessage });
-}
-
-const findUserByEmail = (email: string): User | undefined => {
-  return users.find(user => user.email === email);
-}
-
-const findUserIndexByEmail = (email: string): number => {
-  return users.findIndex(user => user.email === email);
-}
+import { handleError } from '../helpers/helper.handleError';
+import { findUserByEmail, findUserIndexByEmail } from '../helpers/helper.reusableFunctions';
 
 
 export const getAllUser = (_req: Request, res: Response):any => {
@@ -110,7 +99,7 @@ export const deleteUser = (req: Request, res: Response):any => {
     }
     
     users.splice(userIndex, 1);
-    return res.status(204).json({ message: 'User deleted successfully' });
+    return res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error deleting user:', error);
     return handleError(res);
