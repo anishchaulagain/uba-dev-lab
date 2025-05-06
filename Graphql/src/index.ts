@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { typeDefs } from './utils/schema';
 import { resolvers } from './resolvers/resolvers';
 import dotenv from 'dotenv';
+import * as userDatasource from './datasources/user.datasource'; // Import datasource
 
 dotenv.config();
 
@@ -13,6 +14,11 @@ const startServer = async () => {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => {
+      return {
+        userDatasource,
+      };
+    },
   });
 
   await server.start();
