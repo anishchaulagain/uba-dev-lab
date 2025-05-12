@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "strict": true,
+    "types": ["jest"],               // ✅ Add this for Jest type support
+    "resolveJsonModule": true,      // ✅ Optional, if importing JSON files
+    "moduleResolution": "node",     // ✅ Needed for resolving node modules
+    "skipLibCheck": true            // ✅ Speeds up build by skipping type checks in node_modules
+  },
+  "include": ["src", "**/*.test.ts"],  
+  "exclude": ["node_modules", "dist"]
+}
