@@ -37,7 +37,7 @@ describe('getAllUser Controller', () => {
     });
 
     getAllUser({} as Request, mockRes as Response);
-
+    //assertions
     expect(handleErrorMock).toHaveBeenCalledWith(mockRes as Response);
   });
 });

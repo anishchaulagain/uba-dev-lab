@@ -46,7 +46,7 @@ describe('Update User', () => {
     const response = await request(app)
       .put('/users/anish@examplemail.com')
       .send({ name: 'Should Fail' });   
-
+     //assertions
     expect(handleErrorSpy).toHaveBeenCalled();  //Because of the mocked error in findIndex, the operation will fail internally and trigger the mocked handleError.
     expect(response.status).toBe(500);
     expect(response.body.message).toBe('Internal Server Error');

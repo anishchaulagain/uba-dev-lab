@@ -38,7 +38,7 @@ describe('Delete User Controller', () => {
       });
 
     const response = await request(app).delete('/users/anish@examplemail.com');
-
+    //assertions
     expect(handleErrorSpy).toHaveBeenCalled();
     expect(response.status).toBe(500);
     expect(response.body.message).toBe('Internal Server Error');

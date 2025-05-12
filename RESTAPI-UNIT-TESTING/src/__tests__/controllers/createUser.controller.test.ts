@@ -62,7 +62,8 @@ describe('Create User Controller', () => {
             .post('/users')
             .send({ name: 'Crash', email: 'crash@examplemail.com', salary: 10000 });
 
-        expect(handleErrorSpy).toHaveBeenCalled();
+            //assertions
+        expect(handleErrorSpy).toHaveBeenCalled();   
         expect(response.status).toBe(500);
         expect(response.body.message).toBe('Internal Server Error');
     });

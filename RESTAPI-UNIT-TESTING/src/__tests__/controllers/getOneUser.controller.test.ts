@@ -53,7 +53,7 @@ describe('getOneUser Controller', () => {
     });
 
     getOneUser({} as Request, mockRes as Response);
-
+    //assertions
     expect(handleErrorMock).toHaveBeenCalledWith(mockRes as Response);
   });
 });
