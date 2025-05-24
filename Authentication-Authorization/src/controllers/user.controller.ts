@@ -32,7 +32,16 @@ export const getOneUserWithInternships = async (req: Request, res: Response) => 
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const updated = await userService.updateUserService(Number(req.params.id), req.body);
+     const { firstName, lastName, email, password } = req.body;
+    if (password) {
+      res.status(400).json({
+        message: 'You are not allowed to update the password from this endpoint.',
+      });
+    }
+    const updated = await userService.updateUserService(Number(req.params.id), {
+      firstName,
+      lastName,
+    });
     res.status(200).json({ message: 'User updated successfully', user: updated });
   } catch (err) {
     handleError(res, err, 'Error updating user');

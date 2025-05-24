@@ -13,8 +13,10 @@ const mockResponse = () => {
   return res;
 };
 
+
+
 describe('User Controller', () => {
-  const mockUser = { id: 1, name: 'John Doe' };
+  const mockUser = { firstName: 'Anish', lastName: "Chaulagain" };
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -32,7 +34,8 @@ describe('User Controller', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({ message: 'User created successfully', user: mockUser });
   });
-  it('should handle error in createUser (catch block)', async () => {
+
+  test('should handle error in createUser (catch block)', async () => {
     const req = { body: mockUser } as Request;
     const res = mockResponse();
     const error = new Error('Database down');
@@ -44,6 +47,7 @@ describe('User Controller', () => {
     expect(userService.createUserService).toHaveBeenCalledWith(mockUser);
     expect(handleError).toHaveBeenCalledWith(res, error, 'Error creating user');
   });
+
   test('getUsersWithInternships - success', async () => {
     const req = {} as Request;
     const res = mockResponse();
@@ -55,7 +59,7 @@ describe('User Controller', () => {
     expect(userService.getUsersWithInternshipsService).toHaveBeenCalled();
     expect(res.json).toHaveBeenCalledWith([mockUser]);
   });
-  it('should handle error in getUsersWithInternships (catch block)', async () => {
+  test('should handle error in getUsersWithInternships (catch block)', async () => {
     const req = { body: mockUser } as Request;
     const res = mockResponse();
     const error = new Error('Database down');
@@ -79,7 +83,7 @@ describe('User Controller', () => {
     expect(userService.getOneUserWithInternshipsService).toHaveBeenCalledWith(1);
     expect(res.json).toHaveBeenCalledWith(mockUser);
   });
-  it('should handle error in getOneUserWithInternships (catch block)', async () => {
+  test('should handle error in getOneUserWithInternships (catch block)', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockResponse();
     const error = new Error('Database down');
@@ -108,15 +112,21 @@ describe('User Controller', () => {
     const req = { params: { id: '1' }, body: mockUser } as unknown as Request;
     const res = mockResponse();
 
-    (userService.updateUserService as jest.Mock).mockResolvedValue(mockUser);
+    const updatedUser = { id: 1, ...mockUser }; 
+
+    (userService.updateUserService as jest.Mock).mockResolvedValue(updatedUser);
 
     await userController.updateUser(req, res);
 
     expect(userService.updateUserService).toHaveBeenCalledWith(1, mockUser);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ message: 'User updated successfully', user: mockUser });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'User updated successfully',
+      user: updatedUser,
+    });
   });
-  it('should handle error in updateUser (catch block)', async () => {
+
+  test('should handle error in updateUser (catch block)', async () => {
     const req = { params: { id: '1' }, body: mockUser } as unknown as Request;
     const res = mockResponse();
     const error = new Error('Database down');
@@ -141,7 +151,7 @@ describe('User Controller', () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
   });
-  it('should handle error in deleteUser (catch block)', async () => {
+  test('should handle error in deleteUser (catch block)', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockResponse();
     const error = new Error('Database down');
@@ -160,23 +170,7 @@ describe('User Controller', () => {
     const data = [{ userId: 1, count: 3 }];
 
     (userService.getUsersWithInternshipCountService as jest.Mock).mockResolvedValue(data);
-
     await userController.getUsersWithInternshipCount(req, res);
-
     expect(res.json).toHaveBeenCalledWith(data);
   });
-
-  test('createUser - error handling', async () => {
-    const req = { body: mockUser } as Request;
-    const res = mockResponse();
-    const err = new Error('DB error');
-
-    (userService.createUserService as jest.Mock).mockRejectedValue(err);
-
-    await userController.createUser(req, res);
-
-    expect(handleError).toHaveBeenCalledWith(res, err, 'Error creating user');
-  });
- 
-
 });

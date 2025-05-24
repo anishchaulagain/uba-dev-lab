@@ -2,15 +2,18 @@ import express from 'express';
 import { createUser, deleteUser, getOneUserWithInternships, getUsersWithInternshipCount, getUsersWithInternships, updateUser } from '../controllers/user.controller';
 import { validate } from '../middleware/validate';
 import { userSchema } from '../validators/user.validator';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
+// Public route
 router.get('/count', getUsersWithInternshipCount);
-router.post('/', validate(userSchema), createUser);
-router.get('/', getUsersWithInternships);
-//router.get('/:id', getOneUserWithInternships);
-router.put('/:id', validate(userSchema), updateUser);
-router.delete('/:id', deleteUser);
 
+// Protected routes
+router.post('/', authenticate, validate(userSchema), createUser);
+router.get('/', authenticate, getUsersWithInternships);
+//router.get('/:id', authenticate, getOneUserWithInternships);
+router.put('/:id', authenticate, validate(userSchema), updateUser);
+router.delete('/:id', authenticate, deleteUser);
 
 export default router;

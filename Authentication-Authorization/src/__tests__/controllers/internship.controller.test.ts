@@ -14,7 +14,13 @@ const mockResponse = () => {
 };
 
 describe('Internship Controller', () => {
-  const mockInternship = { id: 1, title: 'Software Intern', userId: 1 };
+  const mockInternship = {
+    joinedDate: new Date('2024-01-01'),
+    completionDate: new Date('2024-06-01'),
+    isCertified: true,
+    mentorName: 'Dummy Mentor',
+    userId: 18
+  };
 
   afterEach(() => {
     jest.clearAllMocks();

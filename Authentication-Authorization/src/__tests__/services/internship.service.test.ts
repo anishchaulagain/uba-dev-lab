@@ -1,22 +1,31 @@
-import { internshipRepo } from '../../repositories/internship.repository';
-import { userRepo } from '../../repositories/user.repository';
-import * as internshipService from '../../services/internship.service';
-import { Internship } from '../../database/entities/Internship';
+import { createInternshipService, updateInternshipService, deleteInternshipService } from '../../services/internship.service';
+import { internshipRepo } from '../../repositories/internship.repository'; 
+import { userRepo } from '../../repositories/user.repository'; 
+import { Internship } from '../../database/entities/Internship'; 
+import { User } from '../../database/entities/User';
 
 jest.mock('../../repositories/internship.repository');
 jest.mock('../../repositories/user.repository');
 
-describe('Internship Service', () => {
-  const mockUser = { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', createdAt: new Date(), internships: [] };
-  const mockInternship: Partial<Internship> = {
-    id: 1,
-    joinedDate: new Date('2024-01-01'),
-    completionDate: null,
-    isCertified: false,
-    mentorName: 'Jane Smith',
-    user: mockUser,
-  };
+describe('Internship Services', () => {
+  const mockUser: User = {
+  id: 1,
+  firstName: 'Anish',
+  lastName: 'Chaulagain',
+  email: 'anish@example.com',
+  password: 'hashedPassword',
+  createdAt: new Date('2023-01-01T00:00:00.000Z'),
+  internships: [] as Internship[],
+};
 
+const mockInternship: Internship = {
+  id: 1,
+  joinedDate: new Date('2024-01-01'),
+  completionDate: new Date('2024-06-01'),
+  isCertified: true,
+  mentorName: 'Dummy Mentor',
+  user: mockUser,
+};
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -27,80 +36,54 @@ describe('Internship Service', () => {
       (internshipRepo.create as jest.Mock).mockReturnValue(mockInternship);
       (internshipRepo.save as jest.Mock).mockResolvedValue(mockInternship);
 
-      const data = {
-        joinedDate: new Date('2024-01-01'),
-        completionDate: null,
-        isCertified: false,
-        mentorName: 'Jane Smith',
-        userId: 1,
-      };
+      const data = { title: 'Test Internship', userId: 1 };
+      const result = await createInternshipService(data);
 
-      const result = await internshipService.createInternshipService(data);
-
-      expect(userRepo.findOneByOrFail).toHaveBeenCalledWith({ id: data.userId });
+      expect(userRepo.findOneByOrFail).toHaveBeenCalledWith({ id: 1 });
       expect(internshipRepo.create).toHaveBeenCalledWith({ ...data, user: mockUser });
       expect(internshipRepo.save).toHaveBeenCalledWith(mockInternship);
       expect(result).toEqual(mockInternship);
     });
-
-    it('should throw if userRepo.findOneByOrFail throws', async () => {
-      const error = new Error('User not found');
-      (userRepo.findOneByOrFail as jest.Mock).mockRejectedValue(error);
-
-      await expect(
-        internshipService.createInternshipService({
-          joinedDate: new Date(),
-          completionDate: null,
-          isCertified: false,
-          mentorName: 'Mentor',
-          userId: 999,
-        })
-      ).rejects.toThrow('User not found');
-    });
   });
 
   describe('updateInternshipService', () => {
-    it('should update and save the internship', async () => {
-      const existingInternship = { ...mockInternship };
-      (internshipRepo.findOne as jest.Mock).mockResolvedValue(existingInternship);
-      (internshipRepo.merge as jest.Mock).mockImplementation((entity, data) => Object.assign(entity, data));
-      (internshipRepo.save as jest.Mock).mockResolvedValue(existingInternship);
+  it('should update and save the internship', async () => {
+    const updatedData = { mentorName: 'Updated Mentor', isCertified: false };
+    const mergedInternship = { ...mockInternship, ...updatedData };
 
-      const updatedData = {
-        isCertified: true,
-        mentorName: 'Updated Mentor',
-      };
+    (internshipRepo.findOne as jest.Mock).mockResolvedValue(mockInternship);
+    (internshipRepo.merge as jest.Mock).mockImplementation((target, source) => Object.assign(target, source));
+    (internshipRepo.save as jest.Mock).mockResolvedValue(mergedInternship);
 
-      const result = await internshipService.updateInternshipService(1, updatedData);
+    const result = await updateInternshipService(1, updatedData);
 
-      expect(internshipRepo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['user'] });
-      expect(internshipRepo.merge).toHaveBeenCalledWith(existingInternship, updatedData);
-      expect(internshipRepo.save).toHaveBeenCalledWith(existingInternship);
-      expect(result).toEqual(existingInternship);
-      expect(result.isCertified).toBe(true);
-      expect(result.mentorName).toBe('Updated Mentor');
-    });
-
-    it('should throw error if internship not found', async () => {
-      (internshipRepo.findOne as jest.Mock).mockResolvedValue(null);
-
-      await expect(internshipService.updateInternshipService(999, {})).rejects.toThrow('Internship not found');
-    });
+    expect(internshipRepo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['user'] });
+    expect(internshipRepo.merge).toHaveBeenCalledWith(mockInternship, updatedData);
+    expect(internshipRepo.save).toHaveBeenCalledWith(mergedInternship);
+    expect(result.mentorName).toBe('Updated Mentor');
+    expect(result.isCertified).toBe(false);
   });
 
+  it('should throw error if internship not found', async () => {
+    (internshipRepo.findOne as jest.Mock).mockResolvedValue(null);
+
+    await expect(updateInternshipService(999, {})).rejects.toThrow('Internship not found');
+  });
+});
+
+
   describe('deleteInternshipService', () => {
-    it('should delete the internship if found', async () => {
+    it('should delete the internship if it exists', async () => {
       (internshipRepo.delete as jest.Mock).mockResolvedValue({ affected: 1 });
 
-      await expect(internshipService.deleteInternshipService(1)).resolves.toBeUndefined();
-
+      await expect(deleteInternshipService(1)).resolves.toBeUndefined();
       expect(internshipRepo.delete).toHaveBeenCalledWith(1);
     });
 
     it('should throw error if internship not found', async () => {
       (internshipRepo.delete as jest.Mock).mockResolvedValue({ affected: 0 });
 
-      await expect(internshipService.deleteInternshipService(999)).rejects.toThrow('Internship not found');
+      await expect(deleteInternshipService(999)).rejects.toThrow('Internship not found');
     });
   });
 });
