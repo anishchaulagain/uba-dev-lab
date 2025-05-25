@@ -3,12 +3,14 @@ import { createInternship, deleteInternship, updateInternship } from '../control
 import { validate } from '../middleware/validate';
 import { internshipSchema } from '../validators/internship.validator';
 import { authenticate } from '../middleware/auth.middleware';
+import { authorize } from '../middleware/authorize.middleware';
+import { RoleType } from '../database/entities/Role';
 
 const router = express.Router();
 
 // Protected routes
-router.post('/', authenticate, validate(internshipSchema), createInternship);
-router.put('/:id', authenticate, validate(internshipSchema), updateInternship);
-router.delete('/:id', authenticate, deleteInternship);
+router.post('/', authenticate, authorize([RoleType.USER, RoleType.MENTOR, RoleType.ADMIN]), validate(internshipSchema), createInternship);
+router.put('/:id', authenticate, authorize([RoleType.MENTOR, RoleType.ADMIN]),  validate(internshipSchema), updateInternship);
+router.delete('/:id', authenticate, authorize([RoleType.ADMIN]),  deleteInternship);
 
 export default router;

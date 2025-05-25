@@ -3,17 +3,19 @@ import { createUser, deleteUser, getOneUserWithInternships, getUsersWithInternsh
 import { validate } from '../middleware/validate';
 import { userSchema } from '../validators/user.validator';
 import { authenticate } from '../middleware/auth.middleware';
+import { authorize } from '../middleware/authorize.middleware';
+import { RoleType } from '../database/entities/Role';
 
 const router = express.Router();
 
-// Public route
-router.get('/count', getUsersWithInternshipCount);
+//unprotected Route
+router.get('/count', getUsersWithInternshipCount); 
 
-// Protected routes
-router.post('/', authenticate, validate(userSchema), createUser);
-router.get('/', authenticate, getUsersWithInternships);
-//router.get('/:id', authenticate, getOneUserWithInternships);
-router.put('/:id', authenticate, validate(userSchema), updateUser);
-router.delete('/:id', authenticate, deleteUser);
+//Protected Routes
+router.post('/', authenticate, validate(userSchema),  authorize([RoleType.MENTOR, RoleType.ADMIN]),  createUser);
+router.get('/', authenticate, authorize([RoleType.USER, RoleType.MENTOR, RoleType.ADMIN]),  getUsersWithInternships);
+//router.get('/:id', authenticate, authorize([RoleType.USER, RoleType.MENTOR, RoleType.ADMIN]),  getOneUserWithInternships);
+router.put('/:id', authenticate, authorize([RoleType.MENTOR, RoleType.ADMIN]),  validate(userSchema), updateUser);
+router.delete('/:id', authenticate,  authorize([RoleType.ADMIN]),  deleteUser);
 
 export default router;
