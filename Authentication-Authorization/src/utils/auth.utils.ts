@@ -3,11 +3,11 @@ import bcrypt from 'bcrypt';
 
 // to Generate JWT token
 export const generateToken = (payload: any) => {
-  return jwt.sign(
-    payload,
-    process.env.JWT_SECRET as string,
-    { expiresIn: '1h' }
-  );
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+  return jwt.sign(payload, secret, { expiresIn: '1h' });
 };
 
 // Hash password

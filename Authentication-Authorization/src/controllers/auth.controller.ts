@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { generateToken, hashPassword, comparePassword } from '../utils/auth.utils';
 import { userRepo } from '../repositories/user.repository';
+import { handleError } from '../utils/helper.errorhandler';
 
 //Register user method
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -30,10 +31,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       message: 'User registered successfully',
       user: userWithoutPassword
     });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+  } catch (err) {
+      handleError(res, err, 'Registration error');
+    }
 };
 
 
@@ -58,8 +58,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       user: userWithoutPassword,
       token
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    handleError(res, err, 'Login error');
   }
 };

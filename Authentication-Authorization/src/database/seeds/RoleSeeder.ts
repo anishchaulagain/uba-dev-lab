@@ -1,10 +1,11 @@
 import { DataSource } from 'typeorm';
 import { Role, RoleType } from '../entities/Role';
+import { roleRepo } from '../../repositories/role.repository';
 
 export const seedRoles = async (dataSource: DataSource): Promise<Role[]> => {
-  const roleRepository = dataSource.getRepository(Role);
   
-  const existingRoles = await roleRepository.find();
+  
+  const existingRoles = await roleRepo.find();
   if (existingRoles.length > 0) {
     console.log('Roles already seeded, skipping...');
     return existingRoles;
@@ -26,7 +27,7 @@ export const seedRoles = async (dataSource: DataSource): Promise<Role[]> => {
     }
   ];
 
-  const savedRoles = await roleRepository.save(roles);
+  const savedRoles = await roleRepo.save(roles);
   console.log('Roles seeded successfully');
   return savedRoles;
 };
