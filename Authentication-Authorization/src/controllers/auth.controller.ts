@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    const user = await userRepo.findOne({ where: { email } });
+    const user = await userRepo.findOne({ where: { email }, relations: ['roles'], });
 
     if (!user || !(await comparePassword(password, user.password))) {
       res.status(401).json({ message: 'Invalid credentials' });
@@ -52,11 +52,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const token = generateToken({ id: user.id, email: user.email });
 
     const { password: _, ...userWithoutPassword } = user;
+    const roles = user.roles.map(role => role.name);
 
     res.status(200).json({
       message: 'Login successful',
       user: userWithoutPassword,
-      token
+      token,
+      roles
     });
   } catch (err) {
     handleError(res, err, 'Login error');

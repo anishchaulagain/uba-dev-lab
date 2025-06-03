@@ -16,7 +16,7 @@ export const getOneUserWithInternshipsService = async (id: number) => {
 
 export const updateUserService = async (id: number, data: Partial<User>) => {
   const user = await userRepo.findOneBy({ id });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new Error('User not found');0
   userRepo.merge(user, data);
   return await userRepo.save(user);
 };

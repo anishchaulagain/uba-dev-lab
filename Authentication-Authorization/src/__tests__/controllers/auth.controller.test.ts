@@ -86,12 +86,17 @@ describe('Auth Controller', () => {
                 email: 'anish@example.com',
                 password: 'hashedPassword',
                 firstName: 'Anish',
-                lastName: 'Chaulagain'
+                lastName: 'Chaulagain',
+                roles: [
+                    { name: 'admin' },
+                    { name: 'mentor' }
+                ]
             };
 
             (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
             (authUtils.comparePassword as jest.Mock).mockResolvedValue(true);
             (authUtils.generateToken as jest.Mock).mockReturnValue('jwt-token');
+
 
             await login(req, res);
 
@@ -103,7 +108,8 @@ describe('Auth Controller', () => {
                 user: expect.objectContaining({
                     email: 'anish@example.com'
                 }),
-                token: 'jwt-token'
+                token: 'jwt-token',
+                roles: ['admin', 'mentor']
             }));
         });
 
